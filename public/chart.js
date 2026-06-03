@@ -9,6 +9,14 @@ const retryBtn = document.getElementById('retry-btn');
 
 let chartInstance = null;
 
+function apiPath(path) {
+  const pathname = window.location.pathname;
+  const base = pathname.endsWith('/')
+    ? pathname.slice(0, -1)
+    : pathname.replace(/\/[^/]*$/, '');
+  return `${base || ''}${path}`;
+}
+
 function showLoading() {
   statusEl.classList.remove('hidden');
   chartWrapEl.classList.add('hidden');
@@ -193,7 +201,7 @@ function renderChart(data) {
 async function loadData() {
   showLoading();
   try {
-    const res = await fetch('/api/index/trend');
+    const res = await fetch(apiPath('/api/index/trend'));
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.error || `请求失败 (${res.status})`);

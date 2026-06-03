@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const { getLastTradingDay } = require('./tradingDay');
 const { fetchSseIndexTrend } = require('./fetchIndex');
+const { fetchFinanceNews } = require('./fetchNews');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,18 @@ app.get('/api/index/trend', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message || '获取数据失败' });
+  }
+});
+
+app.get('/api/news', async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(30, Math.max(1, parseInt(req.query.limit, 10) || 15));
+    const data = await fetchFinanceNews(page, limit);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message || '获取新闻失败' });
   }
 });
 

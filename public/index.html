@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>上证指数 · 昨日趋势</title>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/vendor/echarts.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="vendor/echarts.min.js"></script>
   </head>
   <body>
     <div class="container">
@@ -24,11 +24,21 @@
         <div id="chart" class="chart"></div>
       </div>
 
+      <section id="news-section" class="news-section">
+        <div class="news-header">
+          <h2 class="news-heading">财经要闻</h2>
+          <span id="news-hint" class="news-hint">加载中…</span>
+        </div>
+        <ul id="news-list" class="news-list"></ul>
+        <p id="news-error" class="news-error hidden"></p>
+      </section>
+
       <div id="error" class="error hidden">
         <p id="error-msg">数据加载失败</p>
         <button id="retry-btn" type="button">重试</button>
       </div>
     </div>
-    <script src="/chart.js"></script>
+    <script src="chart.js"></script>
+    <script src="news.js"></script>
   </body>
 </html>
