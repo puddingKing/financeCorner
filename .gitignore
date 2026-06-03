@@ -1,0 +1,8 @@
+node_modules/
+*.tar.gz
+.DS_Store
+yarn-error.log
+.env
+.env.*
+*.pem
+*.key
