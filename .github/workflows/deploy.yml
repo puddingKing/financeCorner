@@ -1,0 +1,67 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pack application
+        run: |
+          tar czf /tmp/sse-index-deploy.tar.gz \
+            --exclude=node_modules \
+            --exclude='*.tar.gz' \
+            --exclude=.git \
+            -C "${{ github.workspace }}" .
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload and deploy
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          APP_DIR="${APP_DIR:-/opt/sse-index}"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            /tmp/sse-index-deploy.tar.gz \
+            "${SSH_USER}@${SSH_HOST}:/tmp/sse-index-deploy.tar.gz"
+
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            "${{ github.workspace }}/deploy/update-app.sh" \
+            "${SSH_USER}@${SSH_HOST}:/tmp/update-app.sh"
+
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            "${SSH_USER}@${SSH_HOST}" \
+            "chmod +x /tmp/update-app.sh && APP_DIR='${APP_DIR}' bash /tmp/update-app.sh"
+
+      - name: Health check
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+        run: |
+          if [[ -z "${DEPLOY_URL}" ]]; then
+            echo "未配置 DEPLOY_URL，跳过健康检查"
+            exit 0
+          fi
+          for i in 1 2 3 4 5; do
+            if curl -fsS --max-time 15 "${DEPLOY_URL}/api/index/trend" | head -c 80; then
+              echo ""
+              echo "健康检查通过"
+              exit 0
+            fi
+            echo "等待应用启动 (${i}/5)..."
+            sleep 5
+          done
+          echo "健康检查失败"
+          exit 1
