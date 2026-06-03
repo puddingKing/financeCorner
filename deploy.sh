@@ -65,6 +65,10 @@ EOF
 }
 
 pack() {
+  echo "[deploy] 构建前端..."
+  if [[ -f "$SCRIPT_DIR/package.json" ]]; then
+    (cd "$SCRIPT_DIR" && npm run build)
+  fi
   echo "[deploy] 打包项目..."
   tar czf "$TARBALL" \
     --exclude=node_modules \

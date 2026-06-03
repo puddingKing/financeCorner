@@ -7,7 +7,7 @@ const { fetchFinanceNews } = require('./fetchNews');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+const publicDir = path.join(__dirname, '..', 'public');
 
 app.get('/api/index/trend', async (req, res) => {
   try {
@@ -30,6 +30,15 @@ app.get('/api/news', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message || '获取新闻失败' });
   }
+});
+
+app.use(express.static(publicDir));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 app.listen(PORT, () => {

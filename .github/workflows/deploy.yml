@@ -12,6 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install and build
+        run: |
+          npm install
+          npm run build
+
       - name: Pack application
         run: |
           tar czf /tmp/sse-index-deploy.tar.gz \

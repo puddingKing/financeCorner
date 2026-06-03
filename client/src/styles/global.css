@@ -132,10 +132,6 @@ body {
   background: #0958d9;
 }
 
-.hidden {
-  display: none !important;
-}
-
 .news-section {
   margin-top: 32px;
   padding-top: 24px;

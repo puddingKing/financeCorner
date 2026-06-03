@@ -1,4 +1,6 @@
 node_modules/
+public/assets/
+public/index.html
 *.tar.gz
 .DS_Store
 yarn-error.log

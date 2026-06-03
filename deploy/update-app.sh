@@ -22,6 +22,11 @@ else
   npm install --omit=dev
 fi
 
+if [[ ! -f "$APP_DIR/public/index.html" ]]; then
+  echo "缺少前端构建产物 public/index.html，请在部署前执行 npm run build"
+  exit 1
+fi
+
 log "重启应用 ..."
 if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
   pm2 restart "$APP_NAME"
