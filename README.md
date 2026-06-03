@@ -77,3 +77,5 @@ flowchart LR
 - Node.js 18+ / Express
 - ECharts（本地静态资源）
 - PM2 + Nginx（生产部署）
+
+## 自动部署
